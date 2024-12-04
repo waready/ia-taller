@@ -11,10 +11,6 @@ const axios = require('axios');
 const path = require('path'); // Importa el módulo path
 const sharp = require('sharp');
 
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const https = require('https');
-
 // Configuración de OpenAI
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -22,18 +18,9 @@ const client = new OpenAI({
 
 // Configuración de Express
 const app = express();
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/generated', express.static(path.join(__dirname, 'generated')));
-
 const upload = multer({ dest: 'uploads/' });
-// Ejemplo de una ruta pública para verificar el servidor
-app.get('/', (req, res) => {
-  res.send('Servidor corriendo con HTTPS/HTTP');
-});
+app.use('/generated', express.static(path.join(__dirname, 'generated')));
 
 // Configuración de la base de datos SQLite
 const db = new sqlite3.Database('./database.sqlite', (err) => {
@@ -449,7 +436,6 @@ app.post('/import-users', upload.single('file'), (req, res) => {
 });
   
 
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
-
-
