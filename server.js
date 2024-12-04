@@ -449,30 +449,7 @@ app.post('/import-users', upload.single('file'), (req, res) => {
 });
   
 
-// Configuración del puerto
 const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
 
 
-// Configuración de SSL
-let sslOptions;
-try {
-    sslOptions = {
-        key: fs.readFileSync('/etc/letsencrypt/live/waready.pro/privkey.pem'),
-        cert: fs.readFileSync('/etc/letsencrypt/live/waready.pro/cert.pem'),
-    };
-    console.log('Certificados SSL cargados con éxito.');
-} catch (error) {
-    console.error('Error al cargar certificados SSL:', error.message);
-    console.log('Iniciando servidor en HTTP en lugar de HTTPS.');
-}
-
-// Inicialización del servidor
-if (sslOptions) {
-  https.createServer(sslOptions, app).listen(PORT, () => {
-      console.log(`Servidor HTTPS escuchando en el puerto ${PORT}`);
-  });
-} else {
-  app.listen(PORT, () => {
-      console.log(`Servidor HTTP escuchando en el puerto ${PORT}`);
-  });
-}
