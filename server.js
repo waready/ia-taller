@@ -26,13 +26,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(express.json());
-
-const upload = multer({ dest: 'uploads/' });
 app.use('/generated', express.static(path.join(__dirname, 'generated')));
 
-
+const upload = multer({ dest: 'uploads/' });
 // Ejemplo de una ruta pública para verificar el servidor
 app.get('/', (req, res) => {
   res.send('Servidor corriendo con HTTPS/HTTP');
@@ -455,27 +452,27 @@ app.post('/import-users', upload.single('file'), (req, res) => {
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
 
-// Opciones de SSL
+
+// Configuración de SSL
 let sslOptions;
 try {
     sslOptions = {
-        key: fs.readFileSync(path.join('/etc/letsencrypt/live/waready.pro/privkey.pem')), // Ruta a tu llave privada
-        cert: fs.readFileSync(path.join('/etc/letsencrypt/live/waready.pro/cert.pem')),   // Ruta a tu certificado
+        key: fs.readFileSync('/etc/letsencrypt/live/waready.pro/privkey.pem'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/waready.pro/cert.pem'),
     };
     console.log('Certificados SSL cargados con éxito.');
 } catch (error) {
-    console.log('Certificados SSL no encontrados. Usando HTTP en su lugar.');
+    console.error('Error al cargar certificados SSL:', error.message);
+    console.log('Iniciando servidor en HTTP en lugar de HTTPS.');
 }
 
-// Iniciar el servidor dependiendo de la disponibilidad de SSL
+// Inicialización del servidor
 if (sslOptions) {
-    // Crear el servidor HTTPS
-    https.createServer(sslOptions, app).listen(PORT, () => {
-        console.log(`Servidor escuchando en HTTPS puerto ${PORT}`);
-    });
+  https.createServer(sslOptions, app).listen(PORT, () => {
+      console.log(`Servidor HTTPS escuchando en el puerto ${PORT}`);
+  });
 } else {
-    // Iniciar el servidor HTTP si no hay SSL
-    app.listen(PORT, () => {
-        console.log(`Servidor escuchando en HTTP puerto ${PORT}`);
-    });
+  app.listen(PORT, () => {
+      console.log(`Servidor HTTP escuchando en el puerto ${PORT}`);
+  });
 }
